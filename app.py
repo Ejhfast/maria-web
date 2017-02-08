@@ -1,7 +1,9 @@
 from flask import Flask, request, Response
 import json
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
+CORS(app)
 
 with open("index.html") as f:
     html_page = f.read()

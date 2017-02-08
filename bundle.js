@@ -23700,10 +23700,8 @@ var postData = function postData(input, component) {
   _axios2.default.post('http://localhost:5000/predict', {
     data: input.value
   }).then(function (response) {
-    console.log(response);
     return response.data;
   }).then(function (json) {
-    console.log("in response", json);
     component.setState({
       scores: json
     });
