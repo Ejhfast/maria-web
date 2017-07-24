@@ -76,7 +76,7 @@ class DataDisplay extends React.Component {
     const pane_style = this.props.scores.length == 0 ? { display: "none" } : styles.pane;
     const format_scores = this.props.scores.join("\n");
     return (<div>
-      <div className="label" style={styles.subtitle} > <b>MRAIA predicted presentation scores:</b></div>
+      <div className="label" style={styles.subtitle} > <b>MARIA predicted presentation scores (assuming gene expression of B-cell lymphoma):</b></div>
       <textarea className="right_pane" style={pane_style} value={format_scores}></textarea>
       </div>);
   }
