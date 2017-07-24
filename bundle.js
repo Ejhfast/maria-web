@@ -23696,9 +23696,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var postData = function postData(input, component) {
+var postData = function postData(input_allele, input_gene, input_seq, component) {
   _axios2.default.post('http://localhost:5000/predict', {
-    data: input.value
+    data: [input_allele.value, input_gene.value, input_seq.value]
   }).then(function (response) {
     return response.data;
   }).then(function (json) {
@@ -23708,7 +23708,9 @@ var postData = function postData(input, component) {
   });
 };
 
-var input = void 0;
+var input_allele = void 0,
+    input_gene = void 0,
+    input_seq = void 0;
 
 var DataEntry = function (_React$Component) {
   _inherits(DataEntry, _React$Component);
@@ -23733,18 +23735,65 @@ var DataEntry = function (_React$Component) {
         null,
         _react2.default.createElement(
           'div',
-          { className: 'left_pane', style: styles.pane },
+          { className: 'allele_pane', style: styles.pane },
           _react2.default.createElement('textarea', { className: 'input_data', style: styles.textarea, ref: function ref(node) {
-              input = node;
+              input_allele = node;
             } }),
-          _react2.default.createElement('br', null),
           _react2.default.createElement(
-            'button',
-            { style: styles.button, onClick: function onClick() {
-                return postData(input, _this2);
-              } },
-            'Analyze'
+            'div',
+            { className: 'label', style: styles.subtitle },
+            ' ',
+            _react2.default.createElement(
+              'b',
+              null,
+              'HLA-DR allele: '
+            ),
+            ' Follow the format HLA-DRB1*07:01, single or double alleles (separtaed by a comma).'
           )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'gene_pane', style: styles.pane },
+          _react2.default.createElement('textarea', { className: 'input_data', style: styles.textarea, ref: function ref(node) {
+              input_gene = node;
+            } }),
+          _react2.default.createElement(
+            'div',
+            { className: 'label', style: styles.subtitle },
+            '  ',
+            _react2.default.createElement(
+              'b',
+              null,
+              'Gene: '
+            ),
+            ' HUGO gene symblos for the corresponding gene of peptides (e.g. KRAS, one per line).'
+          )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'seq_pane', style: styles.pane },
+          _react2.default.createElement('textarea', { className: 'input_data', style: styles.textarea, ref: function ref(node) {
+              input_seq = node;
+            } }),
+          _react2.default.createElement(
+            'div',
+            { className: 'label', style: styles.subtitle },
+            '  ',
+            _react2.default.createElement(
+              'b',
+              null,
+              'Peptide sequence: '
+            ),
+            ' 9-26AA long peptide sequences (one per line).'
+          )
+        ),
+        _react2.default.createElement('br', null),
+        _react2.default.createElement(
+          'button',
+          { style: styles.button, onClick: function onClick() {
+              return postData(input_allele, input_gene, input_seq, _this2);
+            } },
+          'Analyze'
         ),
         _react2.default.createElement(DataDisplay, { scores: this.state.scores })
       );
@@ -23755,13 +23804,19 @@ var DataEntry = function (_React$Component) {
 }(_react2.default.Component);
 
 DataEntry.styles = {
+  subtitle: {
+    margin: "0px 1px 10px 1px",
+    width: "92%"
+  },
   pane: {
-    margin: "20px 0px"
+    display: "inline-block",
+    margin: "20px auto 5px auto",
+    width: "30%"
   },
   textarea: {
-    width: "95%",
-    height: "200px",
-    margin: "0px 0px 10px 0px",
+    width: "90%",
+    height: "300px",
+    margin: "0px 0px 5px 0px",
     padding: "1%",
     border: "1px solid #ccc",
     fontSize: ".9em"
@@ -23783,10 +23838,25 @@ var DataDisplay = function (_React$Component2) {
   _createClass(DataDisplay, [{
     key: 'render',
     value: function render() {
+
       var styles = this.constructor.styles;
       var pane_style = this.props.scores.length == 0 ? { display: "none" } : styles.pane;
       var format_scores = this.props.scores.join("\n");
-      return _react2.default.createElement('textarea', { className: 'right_pane', style: pane_style, value: format_scores });
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'div',
+          { className: 'label', style: styles.subtitle },
+          ' ',
+          _react2.default.createElement(
+            'b',
+            null,
+            'MRAIA predicted presentation scores:'
+          )
+        ),
+        _react2.default.createElement('textarea', { className: 'right_pane', style: pane_style, value: format_scores })
+      );
     }
   }]);
 
@@ -23794,8 +23864,13 @@ var DataDisplay = function (_React$Component2) {
 }(_react2.default.Component);
 
 DataDisplay.styles = {
+  subtitle: {
+    margin: "10px 1px 3px 1px",
+    width: "92%"
+  },
   pane: {
-    width: "95%",
+    margin: "5px 1px 5px 1px",
+    width: "70%",
     height: "200px",
     padding: "1%",
     lineHeight: "1.5em",
@@ -23825,12 +23900,41 @@ var App = function (_React$Component3) {
         _react2.default.createElement(
           'h1',
           { style: styles.h1 },
-          'Maria'
+          _react2.default.createElement(
+            'b',
+            null,
+            'M'
+          ),
+          'HC ',
+          _react2.default.createElement(
+            'b',
+            null,
+            'A'
+          ),
+          'nalysis with ',
+          _react2.default.createElement(
+            'b',
+            null,
+            'R'
+          ),
+          'ecurrent ',
+          _react2.default.createElement(
+            'b',
+            null,
+            'I'
+          ),
+          'tergrated ',
+          _react2.default.createElement(
+            'b',
+            null,
+            'A'
+          ),
+          'rchitecture '
         ),
         _react2.default.createElement(
           'h2',
           { style: styles.h2 },
-          'A deep learning based tool for predicting peptide presentation'
+          'A deep learning based tool for predicting MHC-II peptide presentation'
         ),
         _react2.default.createElement(DataEntry, null)
       );
@@ -23844,12 +23948,12 @@ App.styles = {
   body: {
     fontSize: "14px",
     fontFamily: "helvetica neue, helvetica, sans-serif",
-    width: "800px",
+    width: "1200px",
     margin: "20px auto"
   },
   h1: {
-    fontSize: "1.5em",
-    fontWeight: "800",
+    fontSize: "2.0em",
+    fontWeight: "400",
     margin: "3px 0px"
   },
   h2: {
