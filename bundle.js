@@ -23697,7 +23697,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var postData = function postData(input_allele, input_gene, input_seq, component) {
-  _axios2.default.post('http://localhost:5000/predict', {
+  _axios2.default.post('/predict', {
     data: [input_allele.value, input_gene.value, input_seq.value]
   }).then(function (response) {
     return response.data;

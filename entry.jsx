@@ -4,7 +4,7 @@ import fetch from 'isomorphic-fetch';
 import axios from 'axios';
 
 const postData = (input_allele, input_gene, input_seq, component ) => {
-  axios.post('http://localhost:5000/predict', {
+  axios.post('/predict', {
     data: [input_allele.value, input_gene.value, input_seq.value, ]
   })
   .then(response => {
