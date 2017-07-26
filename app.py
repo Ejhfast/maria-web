@@ -42,11 +42,13 @@ def predict():
         gn_list = gn_list[0:-1]
 
     #scan gene when the input is a single gene without the peptide info
+    single_gene = False
     if len(pep_list) == 0 and len(gn_list) == 1:
-        list_out = scan_gene(gn_list[0])
+        list_out,rpkm0 = scan_gene(gn_list[0])
         if len(list_out) > 1:
             gn_list = list_out[0]
             pep_list = list_out[1]
+            single_gene = True
         else:
             error0.append(list_out)
 
@@ -62,7 +64,13 @@ def predict():
         output = error0
     else:
         #run maria 
-        output = pep_list + [str(round(x,4)) for x in list(predict_with4(pep_list,mhc_list,gn_list,ranking=False))]
+        scores,scores_rank = predict_with4(pep_list,mhc_list,gn_list,binding_ranking=False)
+        if single_gene:
+            output = [gn_list[0]+' Estimated RPKM= '+str(round(rpkm0,1))]
+        else:
+            output = []
+        output += ['Peptide sequence, Raw presentation scores, Normalized percentile (top%)']
+        output += [pep0+','+str(round(x,4))+','+str(round(x_rank,2)) for pep0,x,x_rank in zip(pep_list,scores,scores_rank)]
         #print(output)
         #print(error0)
 

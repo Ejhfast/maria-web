@@ -323,18 +323,34 @@ def make_mhc_list(mhc_list,pep_list):
         out = "Please give one DR allele or two DR alleles separated by a comma only (e.g. HLA-DRB1*07:01,HLA-DRB1*01:01)"
     return out
 
+
+####new code to deal with final scores normalization
+
+dict_neg_scores = pickle.load(open(path_dict+'neg_score_distr.dict','r'))
+def get_final_rank(list_predicted,pep_list,dict_distr):
+    list_out = []
+    for score0, pep0 in zip(list_predicted,pep_list):
+        len0 = len(pep0)
+        rank0 = 100-percentileofscore(dict_distr[len0],score0)
+        list_out.append(rank0)
+    return list_out
+
+####
+
 def predict_with4(pep_list,mhc_list,gn_list,
                   model_merge=model_merge,model_cleavage=model_cleavage,
-                  model_binding=model_binding,ranking=False):
+                  model_binding=model_binding,binding_ranking=False):
     #make the data into the right format
     data0 = [[],[]]
     #print(pep_list)
     for mhc0,gn0,pep0 in zip(mhc_list,gn_list,pep_list):
         data0[0].append([mhc0[0],mhc0[1],gn0])
         data0[1].append(pep0)
-    data0_encoded = add_binding_to_dataset(data0,model_binding,model_cleavage,ranking=ranking)
+    data0_encoded = add_binding_to_dataset(data0,model_binding,model_cleavage,
+        ranking=binding_ranking)
     scores = model_merge.predict(data0_encoded)[:,1]
-    return scores
+    scores_rank = get_final_rank(scores,pep_list,dict_neg_scores)
+    return scores,scores_rank
 
 def slide_gene(str0,len0=15):
     list_out = []
@@ -344,6 +360,7 @@ def slide_gene(str0,len0=15):
 
 def scan_gene(gn0,len0=15):
     out0 = 'Unknown gene'
+    rpkm0 = 'N/A'
     if gn0 in dict_gene2seq:
         pep_full = dict_gene2seq[gn0]
         if gn0 in dict_mcl_rna_blood:
@@ -351,8 +368,9 @@ def scan_gene(gn0,len0=15):
         pep_list = slide_gene(pep_full,len0=len0)
         gn_list = [gn0]*len(pep_list)
         out0 = [gn_list,pep_list]
+        rpkm0 = dict_mcl_rna_blood[gn0]
 
-    return out0
+    return out0,rpkm0
 
 
         
