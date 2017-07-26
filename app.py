@@ -58,6 +58,8 @@ def predict():
     mhc_list = make_mhc_list(data_dr.rstrip(),pep_list)
     if 'allele' in mhc_list:
         error0.append(mhc_list)
+    if len(pep_list) > 2000:
+        error0.append('Limit max 2000 peptides per query')
 
     #only run MARIA if the input data is valid 
     if len(error0) > 0:
